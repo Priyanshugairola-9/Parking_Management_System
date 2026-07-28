@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Vehicles - Smart Parking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: white;
+            color: #f59e0b;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            background: white;
+            color: #f59e0b;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.4s ease;
+            background: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Table Container */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #fef3c7;
+        }
+
+        td {
+            padding: 18px 15px;
+            color: #1e293b;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-departed {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .vehicle-number {
+            font-weight: 700;
+            color: #f59e0b;
+            font-size: 1.05rem;
+        }
+
+        .parking-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .time-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 1.5rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: #fffbeb;
+            border-bottom: 2px solid #fef3c7;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #78350f;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .header h2 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .filter-tabs {
+                width: 100%;
+                justify-content: center;
+            }
+
+            th, td {
+                padding: 12px 10px;
+                font-size: 0.85rem;
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🚗 Vehicle Records</h2>
+            <p>Track all vehicles in the parking system</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span style="font-size: 1.5rem;">
+                            {% if category == 'success' %}✅{% else %}ℹ️{% endif %}
+                        </span>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="controls">
+            <div class="filter-tabs">
+                <button class="filter-btn active" onclick="filterVehicles('all')">All Vehicles</button>
+                <button class="filter-btn" onclick="filterVehicles('active')">🟢 Active</button>
+                <button class="filter-btn" onclick="filterVehicles('departed')">⚪ Departed</button>
+            </div>
+            <a href="/" class="btn">← Back to Home</a>
+        </div>
+
+        {% if vehicles %}
+        <div class="table-container">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCount">{{ vehicles|length }}</div>
+                    <div class="stat-label">Total Records</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="activeCount">
+                        {% set active = vehicles|selectattr('4', 'none')|list|length %}
+                        {{ active }}
+                    </div>
+                    <div class="stat-label">Active Vehicles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="departedCount">
+                        {% set departed = vehicles|rejectattr('4', 'none')|list|length %}
+                        {{ departed }}
+                    </div>
+                    <div class="stat-label">Departed</div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>🅿️ Parking</th>
+                            <th>🚙 Vehicle No.</th>
+                            <th>🏎️ Model</th>
+                            <th>⏰ Arrival</th>
+                            <th>🏁 Departure</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicleTable">
+                        {% for v in vehicles %}
+                        <tr class="vehicle-row" data-status="{{ 'active' if not v[4] else 'departed' }}">
+                            <td>
+                                <div class="parking-location">
+                                    <span>{{ v[5] or 'N/A' }}</span>
+                                    <span style="color: #94a3b8; font-size: 0.8rem;">(#{{ v[0] }})</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="vehicle-number">{{ v[1] }}</div>
+                            </td>
+                            <td>{{ v[2] }}</td>
+                            <td>
+                                <div class="time-info">
+                                    <span>⏰</span>
+                                    <span>{{ v[3] }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if v[4] %}
+                                <div class="time-info">
+                                    <span>🏁</span>
+                                    <span>{{ v[4] }}</span>
+                                </div>
+                                {% else %}
+                                <span style="color: #94a3b8;">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not v[4] %}
+                                <span class="status-badge status-active">🟢 Parked</span>
+                                {% else %}
+                                <span class="status-badge status-departed">⚪ Departed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="table-container">
+            <div class="empty-state">
+                <div class="empty-icon">🚗</div>
+                <div class="empty-text">No Vehicles Found</div>
+                <p style="color: #94a3b8; margin-bottom: 20px;">Start by parking your first vehicle</p>
+                <a href="/add_vehicle" class="btn">🅿️ Park Vehicle</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function filterVehicles(status) {
+            const rows = document.querySelectorAll('.vehicle-row');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                
+                if (status === 'all' || rowStatus === status) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update total count display
+            document.getElementById('totalCount').textContent = visibleCount;
+        }
+    </script>
+</body>
+</html>

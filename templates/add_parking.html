@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Parking - Smart Parking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon input {
+            padding-left: 45px;
+        }
+
+        .input-icon::before {
+            content: attr(data-icon);
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button, .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInDown 0.4s ease;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hint {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 640px) {
+            .card {
+                padding: 30px 20px;
+            }
+
+            .header h2 {
+                font-size: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="header-icon">🅿️</div>
+                <h2>Add New Parking</h2>
+                <p>Create a new parking lot in the system</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span style="font-size: 1.5rem;">
+                                {% if category == 'success' %}✅{% else %}❌{% endif %}
+                            </span>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" id="parkingForm">
+                <div class="form-group">
+                    <label for="pid">Parking ID</label>
+                    <div class="input-icon" data-icon="🔢">
+                        <input type="number" id="pid" name="pid" placeholder="Enter unique ID" required min="1">
+                    </div>
+                    <div class="hint">Unique identifier for the parking lot</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pname">Parking Name</label>
+                    <div class="input-icon" data-icon="📍">
+                        <input type="text" id="pname" name="pname" placeholder="e.g., Mall Parking A" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="level">Level / Floor</label>
+                    <div class="input-icon" data-icon="🏢">
+                        <input type="text" id="level" name="level" placeholder="e.g., Ground Floor, Level 1" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="total">Total Spaces</label>
+                    <div class="input-icon" data-icon="📊">
+                        <input type="number" id="total" name="total" placeholder="Enter total capacity" required min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="free">Free Spaces</label>
+                    <div class="input-icon" data-icon="✅">
+                        <input type="number" id="free" name="free" placeholder="Currently available" required min="0">
+                    </div>
+                    <div class="hint">Must be less than or equal to total spaces</div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">
+                        ➕ Add Parking
+                    </button>
+                    <a href="/" class="btn btn-secondary">
+                        ← Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Form validation
+        document.getElementById('parkingForm').addEventListener('submit', function(e) {
+            const total = parseInt(document.getElementById('total').value);
+            const free = parseInt(document.getElementById('free').value);
+            
+            if (free > total) {
+                e.preventDefault();
+                alert('❌ Free spaces cannot exceed total spaces!');
+            }
+        });
+
+        // Auto-match free spaces to total when total changes
+        document.getElementById('total').addEventListener('input', function() {
+            const freeInput = document.getElementById('free');
+            if (!freeInput.value) {
+                freeInput.value = this.value;
+            }
+        });
+    </script>
+</body>
+</html>

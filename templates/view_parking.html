@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Parking - Smart Parking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #3b82f6;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.4s ease;
+            background: white;
+        }
+
+        .alert-success {
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-danger {
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Card Grid Layout */
+        .parking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .parking-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            animation: slideUp 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+        }
+
+        .parking-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+        }
+
+        .card-id {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .card-level {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .capacity-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .capacity-item {
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .capacity-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .capacity-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .capacity-item.total .capacity-value {
+            color: #3b82f6;
+        }
+
+        .capacity-item.free .capacity-value {
+            color: #10b981;
+        }
+
+        .capacity-item.occupied .capacity-value {
+            color: #ef4444;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            transition: width 0.5s ease;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-full {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-filling {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-sm {
+            flex: 1;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 8px;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 16px;
+            padding: 60px 30px;
+            text-align: center;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 1.5rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .parking-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h2 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .capacity-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🅿️ Parking Lots</h2>
+            <p>Manage and monitor all parking facilities</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span style="font-size: 1.5rem;">
+                            {% if category == 'success' %}✅{% else %}❌{% endif %}
+                        </span>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search parking lots..." onkeyup="filterParking()">
+            </div>
+            <a href="/" class="btn btn-primary">← Back to Home</a>
+        </div>
+
+        {% if parks %}
+        <div class="parking-grid" id="parkingGrid">
+            {% for p in parks %}
+            <div class="parking-card" data-name="{{ p[1]|lower }}" data-level="{{ p[2]|lower }}">
+                <div class="card-header">
+                    <div class="card-icon">🅿️</div>
+                    <div class="card-id">#{{ p[0] }}</div>
+                </div>
+                
+                <div class="card-title">{{ p[1] }}</div>
+                <div class="card-level">📍 {{ p[2] }}</div>
+                
+                <div class="capacity-info">
+                    <div class="capacity-item total">
+                        <div class="capacity-value">{{ p[3] }}</div>
+                        <div class="capacity-label">Total</div>
+                    </div>
+                    <div class="capacity-item free">
+                        <div class="capacity-value">{{ p[4] }}</div>
+                        <div class="capacity-label">Available</div>
+                    </div>
+                    <div class="capacity-item occupied">
+                        <div class="capacity-value">{{ p[3] - p[4] }}</div>
+                        <div class="capacity-label">Occupied</div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ (p[4] / p[3] * 100) if p[3] > 0 else 0 }}%"></div>
+                </div>
+
+                {% if p[4] == 0 %}
+                    <span class="status-badge status-full">🚫 Full</span>
+                {% elif p[4] < p[3] * 0.3 %}
+                    <span class="status-badge status-filling">⚠️ Filling Up</span>
+                {% else %}
+                    <span class="status-badge status-available">✅ Available</span>
+                {% endif %}
+
+                <div class="card-actions">
+                    <form method="POST" action="/delete_parking/{{ p[0] }}" style="flex: 1;" onsubmit="return confirmDelete('{{ p[1] }}')">
+                        <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🅿️</div>
+            <div class="empty-text">No Parking Lots Found</div>
+            <p style="color: #94a3b8; margin-bottom: 20px;">Start by adding your first parking lot</p>
+            <a href="/add_parking" class="btn btn-primary">➕ Add Parking Lot</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function filterParking() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.parking-card');
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                const level = card.getAttribute('data-level');
+                
+                if (name.includes(filter) || level.includes(filter)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function confirmDelete(name) {
+            return confirm(`Are you sure you want to delete parking lot "${name}"?\n\nThis action cannot be undone.`);
+        }
+    </script>
+</body>
+</html>

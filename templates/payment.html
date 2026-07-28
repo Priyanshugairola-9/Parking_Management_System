@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment & Exit - Smart Parking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease;
+            margin-bottom: 20px;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .current-time {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        input[type="text"] {
+            text-transform: uppercase;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon input {
+            padding-left: 45px;
+        }
+
+        .input-icon::before {
+            content: attr(data-icon);
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button, .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.4s ease;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Receipt Styling */
+        .receipt {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease;
+            border-top: 5px solid #10b981;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #e2e8f0;
+        }
+
+        .receipt-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .receipt-title {
+            font-size: 2rem;
+            color: #10b981;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .receipt-subtitle {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .receipt-details {
+            margin-bottom: 25px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .detail-label {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        .total-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ef4444;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 2px dashed #e2e8f0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .hint {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .quick-time-btns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            padding: 8px 12px;
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        @media (max-width: 640px) {
+            .card, .receipt {
+                padding: 30px 20px;
+            }
+
+            .header h2 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .total-amount {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>💰 Payment & Exit</h2>
+            <p>Process vehicle checkout and payment</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span style="font-size: 1.5rem;">
+                            {% if category == 'success' %}✅{% else %}❌{% endif %}
+                        </span>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if payment_info %}
+        <!-- Receipt -->
+        <div class="receipt">
+            <div class="receipt-header">
+                <div class="receipt-icon">✅</div>
+                <div class="receipt-title">Payment Successful</div>
+                <div class="receipt-subtitle">Thank you for using Smart Parking</div>
+            </div>
+
+            <div class="receipt-details">
+                <div class="detail-row">
+                    <span class="detail-label">🚗 Vehicle Number</span>
+                    <span class="detail-value">{{ payment_info.vehicleno }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🏎️ Vehicle Model</span>
+                    <span class="detail-value">{{ payment_info.model }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🅿️ Parking Location</span>
+                    <span class="detail-value">{{ payment_info.parking }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">⏰ Arrival Time</span>
+                    <span class="detail-value">{{ payment_info.arrival }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🏁 Departure Time</span>
+                    <span class="detail-value">{{ payment_info.departure }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">⏱️ Duration</span>
+                    <span class="detail-value">{{ "%.2f"|format(payment_info.duration) }} hours</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">💵 Rate</span>
+                    <span class="detail-value">₹20 per hour</span>
+                </div>
+            </div>
+
+            <div class="total-section">
+                <div class="total-row">
+                    <span class="total-label">Total Amount</span>
+                    <span class="total-amount">₹{{ "%.2f"|format(payment_info.amount) }}</span>
+                </div>
+            </div>
+
+            <div class="receipt-footer">
+                <p>Receipt generated on {{ payment_info.departure }}</p>
+                <p style="margin-top: 10px;">🎉 Have a great day!</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="/" class="btn btn-danger">← Back to Home</a>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Payment Form -->
+        <div class="card">
+            <div class="current-time" id="currentTime">
+                ⏰ Current Time: <span id="time"></span>
+            </div>
+
+            <form method="POST" id="paymentForm">
+                <div class="form-group">
+                    <label for="vehicleno">Vehicle Number</label>
+                    <div class="input-icon" data-icon="🚗">
+                        <input type="text" id="vehicleno" name="vehicleno" placeholder="Enter vehicle number" required autofocus>
+                    </div>
+                    <div class="hint">Enter the vehicle registration number to checkout</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="exit">Exit Time</label>
+                    <div class="input-icon" data-icon="🏁">
+                        <input type="text" id="exit" name="exit" placeholder="Will use current time if empty">
+                    </div>
+                    <div class="hint">Format: HH:MM:SS AM/PM (Leave empty for current time)</div>
+                    
+                    <div class="quick-time-btns">
+                        <button type="button" class="quick-btn" onclick="useCurrentTime()">⏰ Now</button>
+                        <button type="button" class="quick-btn" onclick="addMinutes(30)">+30 min</button>
+                        <button type="button" class="quick-btn" onclick="addMinutes(60)">+1 hour</button>
+                        <button type="button" class="quick-btn" onclick="addMinutes(120)">+2 hours</button>
+                    </div>
+                </div>
+
+                <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="font-weight: 600; color: #92400e; margin-bottom: 5px;">💵 Parking Rate</div>
+                    <div style="color: #78350f;">₹20 per hour (Minimum 1 hour charge)</div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-danger">
+                        💰 Calculate & Pay
+                    </button>
+                    <a href="/" class="btn btn-secondary">
+                        ← Back
+                    </a>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Display current time
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            const timeStr = now.toLocaleTimeString('en-US', options);
+            const timeElement = document.getElementById('time');
+            if (timeElement) {
+                timeElement.textContent = timeStr;
+            }
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Auto-uppercase vehicle number
+        const vehicleInput = document.getElementById('vehicleno');
+        if (vehicleInput) {
+            vehicleInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.toUpperCase();
+            });
+        }
+
+        // Quick time functions
+        function useCurrentTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            document.getElementById('exit').value = timeStr;
+        }
+
+        function addMinutes(minutes) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + minutes);
+            const timeStr = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            document.getElementById('exit').value = timeStr;
+        }
+
+        // Form validation
+        const paymentForm = document.getElementById('paymentForm');
+        if (paymentForm) {
+            paymentForm.addEventListener('submit', function(e) {
+                const vehicleNo = document.getElementById('vehicleno').value.trim();
+                if (vehicleNo.length < 4) {
+                    e.preventDefault();
+                    alert('❌ Please enter a valid vehicle number!');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

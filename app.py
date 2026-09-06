@@ -12,7 +12,7 @@ def get_db_connection():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="tiger",
+            password="tiger",   # put your own password of sql
             database="parkings",
             autocommit=False
         )

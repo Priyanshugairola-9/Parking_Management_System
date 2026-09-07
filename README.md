@@ -91,20 +91,22 @@ Technology| Purpose
 
 Parking_Management_System/
 │
-├── app.py                  # Flask application and backend logic
-├── requirements.txt        # Python dependencies
-├── README.md               # Project documentation
+├── app.py
+├── requirements.txt
+├── README.md
 │
-├── templates/              # HTML templates
-│   ├── ...
-│   └── ...
+├── templates/
+│   ├── index.html
+│   ├── add_parking.html
+│   ├── add_vehicle.html
+│   ├── view_parking.html
+│   ├── view_vehicle.html
+│   ├── search_vehicle.html
+│   └── payment.html
 │
-└── static/                 # Static frontend assets
-    ├── css/
-    ├── js/
-    └── ...
-
-«The exact files inside "templates/" and "static/" may vary as the project evolves.»
+└── static/
+    ├── style.css
+    └── script.js
 
 ---
 

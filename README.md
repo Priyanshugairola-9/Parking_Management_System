@@ -87,26 +87,26 @@ Technology| Purpose
 
 ---
 
-📂 Project Structure
+## 📂 Project Structure
 
 Parking_Management_System/
 │
-├── app.py
-├── requirements.txt
-├── README.md
+├── app.py                  # Main Flask application and backend logic
+├── requirements.txt        # Python dependencies
+├── README.md               # Project documentation
 │
-├── templates/
-│   ├── index.html
-│   ├── add_parking.html
-│   ├── add_vehicle.html
-│   ├── view_parking.html
-│   ├── view_vehicle.html
-│   ├── search_vehicle.html
-│   └── payment.html
+├── templates/              # HTML frontend templates
+│   ├── index.html          # Dashboard / homepage
+│   ├── add_parking.html    # Add parking lot
+│   ├── add_vehicle.html    # Register vehicle entry
+│   ├── view_parking.html   # View parking lots
+│   ├── view_vehicle.html   # View vehicle records
+│   ├── search_vehicle.html # Search vehicle records
+│   └── payment.html        # Parking payment/fare page
 │
-└── static/
-    ├── style.css
-    └── script.js
+└── static/                 # Static frontend assets
+    ├── style.css           # Application styling
+    └── script.js           # Client-side JavaScript
 
 ---
 
